@@ -22,16 +22,22 @@ Reactor 갤러리와 PC의 PromptStudio 자료를 하나로 정리한 개인 프
 
 | 항목 | 수량 |
 |---|---:|
-| 통합 카드 | 27,162 |
-| 프롬프트가 있는 카드 | 25,835 |
-| 기존 Reactor 게시물 | 4,361 |
+| 현재 통합 카드 (모두 프롬프트 수록) | 25,855 |
+| 현재 Reactor 카드 | 3,062 |
+| 현재 PromptStudio 카드 | 22,793 |
+| 최초 통합 카드 | 27,162 |
+| 원본 언어 자료에서 추가 복구한 프롬프트 | 20 |
+| 프롬프트가 없어 제거한 카드 | 1,307 |
+| 최초 Reactor 원본 게시물 | 4,361 |
 | PromptStudio 원본 카드 | 23,616 |
 | 중복 병합 | 815 |
-| 새로 추가한 PromptStudio 카드 | 22,801 |
+| 최초 추가한 PromptStudio 카드 | 22,801 |
 | PC에 저장된 이미지 파일 | 24,024 |
 | PC 이미지의 고유 SHA-256 | 22,812 |
 
 중복은 공백·유니코드를 정규화한 프롬프트와 변수 기본값을 적용한 결과를 비교했습니다. 같은 프롬프트의 추가 이미지를 합치고, 수정할 수 있는 변수가 더 많은 템플릿을 보존했습니다. 카테고리는 제목·설명·태그·프롬프트의 용도에 따라 분류했습니다.
+
+프롬프트가 없는 Reactor 1,299개와 PromptStudio 8개를 현재 목록과 상세 데이터에서 제거했습니다. 별도 언어 파일에 실제 프롬프트가 있는 20개는 복구했습니다. 삭제 카드에만 쓰이는 미리보기 7,290개(229,789,836바이트)를 배포 파일에서 제거했으며, 유지하는 카드와 공유하는 이미지는 보존했습니다. [정리 기록](library/prompt-cleanup-report.json)을 확인할 수 있습니다. 아래 원본 ZIP과 원본 JSON은 최초 수집 당시의 별도 보관본으로 유지하므로 현재 목록 수와 다릅니다. Git 이력의 과거 파일도 유지합니다.
 
 - [PromptStudio 이미지 ZIP 5개와 전체 데이터](https://github.com/byeonghoyoo/reactor-prompts-magazine/releases/tag/promptstudio-2026-10-17): PC 이미지 4,008,062,102바이트. **대부분 앱이 캐시한 미리보기**이며, PC에 있던 파일을 재압축하지 않고 ZIP에 보관했습니다. 파일이 없는 이전 사용자 카드 이미지 2개는 [누락 기록](library/missing-images.json)에 남겼습니다.
 - [기존 Reactor 원본 ZIP 8개](https://github.com/byeonghoyoo/reactor-prompts-magazine/releases/tag/snapshot-2026-10-17): 원본 이미지 16,011장과 추가 썸네일 3,714개를 보관했습니다. 원래 서버에서 404였던 이미지 2,516장은 [기존 누락 기록](missing-images.json)에 남아 있습니다.
@@ -43,10 +49,12 @@ Reactor 갤러리와 PC의 PromptStudio 자료를 하나로 정리한 개인 프
 
 로그인과 관리자 비밀번호 변경은 Cloudflare Worker + D1에서 처리합니다. 비밀번호는 임의의 salt를 사용한 PBKDF2 해시만 저장하며, 브라우저에는 탭 단위 임의 세션 토큰만 보관합니다. 관리자 재인증·버전 비교 갱신·시도 횟수 제한을 적용했습니다. **GitHub Pages·공개 저장소·Releases의 직접 이미지/프롬프트 파일은 계속 공개입니다.** 이 변경은 자료 전체를 비공개 저장소로 전환하는 기능이 아닙니다.
 
-갤러리 프런트엔드는 외부 라이브러리 없이 GitHub Pages에서 운영됩니다. 기존 정적 자료는 약 890MB이며 웹 미리보기는 가볍게 압축되어 있습니다. 보관 파일은 Releases에서 제공합니다. 로그인 서버는 기존 Cloudflare 계정에 추가했으며 별도 요금제 전환은 하지 않았습니다. 소규모 사용은 Workers/D1 무료 제공량 안에서 운영할 수 있으며, 한도 초과 시 해당 서비스 정책을 따릅니다.
+갤러리 프런트엔드는 외부 라이브러리 없이 GitHub Pages에서 운영됩니다. 최초 약 890MB였던 정적 사이트에서 프롬프트 없는 카드의 미리보기 약 230MB를 정리했습니다. 보관 파일은 Releases에서 제공합니다. 로그인 서버는 기존 Cloudflare 계정에 추가했으며 별도 요금제 전환은 하지 않았습니다. 소규모 사용은 Workers/D1 무료 제공량 안에서 운영할 수 있으며, 한도 초과 시 해당 서비스 정책을 따릅니다.
 
 로컬 프런트엔드 실행: `python -m http.server 8765 --bind 127.0.0.1`. 서버 설정/개발 절차는 [auth/README.md](auth/README.md)를 참고하세요.
 
 `scripts/migrate.py`는 최초 Reactor 보관용, `scripts/import_studio.py`는 로컬 PromptStudio 스냅샷 통합용입니다. 후자는 `output/studio-source/source.json`에 준비한 읽기 전용 데이터 사본과 PC 캐시를 사용합니다. `--catalog-only`는 기존 이미지 보관 기록을 이용해 카탈로그만 다시 만듭니다. 데이터 생성이 끝난 뒤 업로드하세요.
+
+`python scripts/prune_empty_prompts.py`는 현재 데이터의 정리 계획을 출력합니다. `--apply`를 붙이면 `output/prompt-cleanup-backup/`에 먼저 사본을 만든 뒤, 복구 가능한 프롬프트를 반영하고 빈 카드와 전용 미리보기만 제거합니다. 모든 경로는 프로젝트 내부의 허용된 상세/미리보기 경로로 제한됩니다.
 
 이미지·프롬프트의 권리는 원저작자에게 있습니다. 원본 운영자와 관계없는 개인 학습용 보관본이며, 원본 콘텐츠에 새 라이선스를 부여하지 않습니다. [원본 Reactor 사이트](https://reactor-prompts-magazine.pages.dev/)

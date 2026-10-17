@@ -33,7 +33,7 @@ function lock(message='') {
   document.title='로그인 · 뷰티블라썸 프롬프트 노트';$('login-id').focus();
 }
 async function enterNotebook(account) {
-  const notebook=await import('./app.js?v=notebook-4');suspendNotebook=notebook.suspendNotebook;
+  const notebook=await import('./app.js?v=notebook-5');suspendNotebook=notebook.suspendNotebook;
   role=account.role;$('login-form').reset();$('login-screen').hidden=true;$('notebook-app').hidden=false;
   $('admin-open').hidden=role!=='admin';document.title='프롬프트 노트 · 뷰티블라썸';
   if(!started){started=true;notebook.startNotebook();}$('search').focus();

@@ -4,6 +4,7 @@ from collections import Counter
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from PIL import Image, ImageOps
+from prompt_content import source_prompt
 
 ROOT = Path(__file__).resolve().parents[1]
 CACHE = Path('C:/Users/metic/AppData/Local/PromptStudio')
@@ -137,6 +138,7 @@ def prepare_media(files):
 def main():
     OUT.mkdir(exist_ok=True); (OUT/'previews').mkdir(exist_ok=True)
     original=read(ROOT/'gallery.json'); studio=read(ROOT/'output/studio-source/source.json')
+    translations=read(ROOT/'source/translations.json'); empty_skipped=Counter(); recovered_prompts=0
     # Snapshot only media files, never application settings, credentials, or sessions.
     files=sorted([p for folder in ['images','my-cards-images'] for p in (CACHE/folder).iterdir() if p.is_file() and p.suffix.lower() in {'.png','.jpg','.jpeg','.webp','.gif','.bin','.svg'}])
     if '--catalog-only' in sys.argv:
@@ -151,17 +153,23 @@ def main():
     def media(item,kind): return {'preview':item['preview'],'archive':RELEASE+item['archive'],'file':item['path'],'kind':kind,'sha256':item['sha256']}
     cards=[]; details={}; keys={}; duplicates=[]; missing=[]; recategorized=Counter()
     for post in original['posts']:
+        prompt,from_translation=source_prompt(post,translations)
+        if not prompt.strip(): empty_skipped['reactor']+=1; continue
+        if from_translation: recovered_prompts+=1
+        post={**post,'prompt':prompt}
         id='reactor:'+str(post['id']); caption=clean(post['caption']); title=caption.split('\n')[0][:180]
         category=categorize(title,'',post['tags'],post['prompt'])
         title=title or dict((k,v) for k,v,_ in CATEGORIES)[category]+' '+str(post['id'])
         images=[{'preview':im.get('preview','') if im['status']=='ok' else '', 'archive':'https://github.com/byeonghoyoo/reactor-prompts-magazine/releases/download/snapshot-2026-10-17/'+im['archive'] if im.get('archive') else '', 'file':im['path'],'kind':'original','missing':im['status']!='ok'} for im in post['images']]
         args=extract_args(post['prompt'],[])
         detail={'id':id,'content':post['prompt'],'args':args,'images':images,'translationId':str(post['id'])}
+        if from_translation: detail['promptSource']='translations:ko'
         details[id]=detail
         cards.append({'id':id,'title':title,'description':caption[len(title):].strip()[:300],'category':category,'tags':post['tags'],'thumbnail':post.get('thumbnail') or '', 'imageCount':len(images),'hasPrompt':bool(post['prompt']),'variables':len(args),'origin':'reactor','personal':False,'date':post.get('timestamp') or ''})
         if post['prompt']: keys.setdefault(normalized(post['prompt']),id)
     for post in studio['prompts']:
         id='studio:'+post['id']; content=str(post.get('content') or '')
+        if not content.strip(): empty_skipped['studio']+=1; continue
         args=extract_args(content,post.get('args',[]))
         title=clean(post.get('title')); desc=clean(post.get('description')); tags=post.get('searchTags') or []
         if re.search(r'https?://|\bvia\b.*prompt',title,re.I): title=re.sub(r'https?://\S+','',title).split('prompt:')[0].strip(' :-')
@@ -208,6 +216,7 @@ def main():
         for card in part: card['chunk']='library/details/'+name
     counts=Counter(card['category'] for card in cards)
     summary={'version':'2026-10-17-notebook-1','totalCards':len(cards),'promptCards':sum(c['hasPrompt'] for c in cards),'reactorCards':len(original['posts']),'studioSourceCards':len(studio['prompts']),'studioImportedCards':sum(c['origin']=='studio' for c in cards),'duplicatesMerged':len(duplicates),'cachedFiles':len(files),'uniqueCachedImages':len(by_hash),'cachedBytes':sum(i['bytes'] for i in manifest),'missingLocalImages':len(missing),'cardsWithoutImage':sum(not c['thumbnail'] for c in cards),'archives':archives,'categoryCounts':dict(counts),'recategorized':dict(recategorized)}
+    summary.update(version='2026-10-17-notebook-5',reactorSourceCards=len(original['posts']),reactorCards=sum(c['origin']=='reactor' for c in cards),emptyPromptCardsRemoved=sum(empty_skipped.values()),translationPromptsRecovered=recovered_prompts)
     write(OUT/'catalog.json',{'version':summary['version'],'summary':summary,'groups':[{'id':i,'label':l} for i,l in GROUPS],'categories':[{'id':i,'label':l,'group':g,'count':counts[i]} for i,l,g in CATEGORIES],'cards':cards})
     write(OUT/'import-report.json',summary); write(OUT/'duplicates.json',duplicates); write(OUT/'missing-images.json',missing)
     if '--catalog-only' not in sys.argv:

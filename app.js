@@ -32,7 +32,7 @@ function effective(card) {
 function rebuildCards() {
   if(!catalog)return;
   const custom=[...entries.values()].filter(e=>e.id.startsWith('custom:')).map(e=>({id:e.id,title:e.title,description:e.description||'',category:e.category||'others',tags:[],thumbnail:e.imageData||'',imageCount:e.imageData?1:0,hasPrompt:!!e.prompt,variables:extractArgs(e.template||'').length,personal:true,origin:'custom'}));
-  cards=[...custom,...catalog.cards].map(effective).map(card=>({...card,title:String(card.title||'제목 없는 카드').slice(0,300)}));
+  cards=[...custom,...catalog.cards].map(effective).filter(card=>card.hasPrompt).map(card=>({...card,title:String(card.title||'제목 없는 카드').slice(0,300)}));
   cards.sort((a,b)=>Number(!a.thumbnail)-Number(!b.thumbnail));
   for(const card of cards)card.searchText=[card.title,card.description,...card.tags,categoryLabel(card.category)].join(' ').toLocaleLowerCase();
   $('all-count').textContent=fmt(cards.length);
@@ -161,7 +161,7 @@ async function copyPrompt() {
 async function init() {
   if(loading)return;loading=true;$('load-error').hidden=true;
   try {
-    const response=await fetch('library/catalog.json?v=notebook-1');if(!response.ok)throw Error('HTTP '+response.status);
+    const response=await fetch('library/catalog.json?v=notebook-5');if(!response.ok)throw Error('HTTP '+response.status);
     const data=await response.json();if(!Array.isArray(data.cards)||!Array.isArray(data.categories)||!Array.isArray(data.groups))throw Error('라이브러리 데이터 형식 오류');catalog=data;
     try{db??=await openNotebook();await reloadEntries();}catch(error){storageWarning(error);}
     makeCategories();rebuildCards();filter();
