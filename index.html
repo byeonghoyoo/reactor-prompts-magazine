@@ -5,7 +5,7 @@
   <meta name="description" content="이미지에서 찾고, 변수를 바꾸고, 프롬프트를 복사해 사용하는 프롬프트 노트."><meta name="theme-color" content="#171a21">
   <meta name="robots" content="noindex,nofollow,noarchive">
   <title>로그인 · 뷰티블라썸 프롬프트 노트</title><link rel="icon" href="data:,">
-  <link rel="stylesheet" href="style.css?v=notebook-3"><link rel="stylesheet" href="login.css?v=notebook-3"><script type="module" src="entry.js?v=notebook-3"></script>
+  <link rel="stylesheet" href="style.css?v=notebook-4"><link rel="stylesheet" href="login.css?v=notebook-4"><script type="module" src="entry.js?v=notebook-4"></script>
 </head>
 <body>
   <section id="login-screen" class="login-screen" aria-labelledby="login-title">
@@ -19,6 +19,7 @@
         <p id="login-error" class="login-error" role="alert" aria-live="polite"></p>
         <button id="login-submit" class="accent" type="submit" disabled>로그인</button>
       </form>
+      <button id="login-mode" class="text-button login-mode" type="button" disabled>관리자 로그인</button>
       <noscript><p class="login-error">로그인하려면 브라우저에서 자바스크립트를 켜 주세요.</p></noscript>
     </div>
   </section>
@@ -27,7 +28,7 @@
   <header class="topbar">
     <a class="brand" href="./"><span class="brand-mark" aria-hidden="true">P<span>n</span></span><span>프롬프트 노트<small>이미지를 아이디어로, 아이디어를 내 것으로.</small></span></a>
     <label class="search"><span aria-hidden="true">⌕</span><input id="search" type="search" maxlength="2000" placeholder="제목, 설명, 태그로 찾기" aria-label="프롬프트 검색" autocomplete="off"><kbd>/</kbd></label>
-    <div class="header-actions"><button id="logout" class="quiet" type="button">로그아웃</button></div>
+    <div class="header-actions"><button id="admin-open" class="quiet" type="button" hidden>관리자</button><button id="logout" class="quiet" type="button">로그아웃</button></div>
   </header>
   <div class="workspace">
     <aside class="sidebar" aria-label="노트 탐색">
@@ -37,6 +38,8 @@
     </aside>
     <main id="library" tabindex="-1">
       <section class="library-heading"><div><p id="breadcrumb">나의 아이디어 라이브러리</p><h1 id="view-title">모든 프롬프트</h1><p id="summary" class="muted" aria-live="polite">이미지와 프롬프트를 불러오고 있습니다…</p></div><div class="heading-note">고른 다음, 바꾸고, 복사하세요.<span>이미지와 프롬프트를 한 곳에서.</span></div></section>
+      <div class="source-tabs" role="group" aria-label="자료 선택"><button data-source="" aria-pressed="true">전체 <span id="source-all-count">—</span></button><button data-source="reactor" aria-pressed="false">처음 사이트 <span id="source-reactor-count">—</span></button><button data-source="studio" aria-pressed="false">PromptStudio 추가 <span id="source-studio-count">—</span></button></div>
+      <p id="merge-summary" class="merge-summary muted"></p>
       <div class="filters"><label class="mobile-category">카테고리<select id="category-select"><option value="">전체 주제</option></select></label><label><input id="prompt-only" type="checkbox">프롬프트 있음</label><label><input id="variables-only" type="checkbox">변수 수정 가능</label><label class="sort-label">정렬<select id="sort"><option value="default">추천 순서</option><option value="title">제목순</option><option value="variables">변수 많은 순</option></select></label><span id="result-count" aria-live="polite"></span></div>
       <p id="storage-warning" class="notice" hidden></p><div id="load-error" class="notice" hidden><p id="load-error-text"></p><button id="retry">다시 불러오기</button></div>
       <div id="gallery" class="gallery" aria-busy="true"></div><div id="empty" class="empty" hidden><h2>아직 이곳에 카드가 없어요.</h2><p>검색 조건을 바꾸거나 마음에 드는 카드를 즐겨찾기에 담아 보세요.</p><button id="clear-filters">검색 조건 초기화</button></div>
@@ -52,6 +55,19 @@
         <section class="prompt-section"><div class="section-heading"><h2>프롬프트</h2><label id="language-label">언어<select id="language"><option value="original">원문</option><option value="ko">한국어</option><option value="en">English</option><option value="ja">日本語</option><option value="zh">中文</option></select></label><button id="use-template" class="text-button">변수 찾기</button><button id="reset-prompt" class="text-button">원문으로</button></div><p id="translation-note" class="muted small"></p><textarea id="prompt-editor" spellcheck="false" placeholder="프롬프트를 직접 작성하거나 편집하세요." aria-label="프롬프트 편집"></textarea><div class="copy-actions"><button id="copy" class="accent">프롬프트 복사</button><a href="https://chatgpt.com/" target="_blank" rel="noopener noreferrer" class="ai-target">ChatGPT 열기 ↗</a><a href="https://gemini.google.com/" target="_blank" rel="noopener noreferrer" class="ai-target">Gemini 열기 ↗</a><a href="https://higgsfield.ai/" target="_blank" rel="noopener noreferrer" class="ai-target">Higgsfield 열기 ↗</a></div><p class="small muted">AI 서비스 열기를 누르면 프롬프트도 복사됩니다.</p></section>
       </div>
     </div>
+  </dialog>
+  <dialog id="admin-dialog" class="admin-dialog" aria-labelledby="admin-title">
+    <div class="detail-top"><h2 id="admin-title">관리자 · 로그인 설정</h2><button id="admin-close" class="icon-button" type="button" aria-label="관리자 화면 닫기">×</button></div>
+    <form id="admin-form" class="admin-body" method="post">
+      <p class="admin-intro">팀원용 로그인 비밀번호를 변경합니다.<br>변경하면 팀원은 새 비밀번호로 다시 로그인해야 합니다.</p>
+      <label class="login-field">팀원 아이디<input id="team-username" type="text" readonly autocomplete="off"></label>
+      <label class="login-field">관리자 비밀번호 확인<input id="admin-password" type="password" autocomplete="current-password" maxlength="128" required></label>
+      <label class="login-field">새 팀원 비밀번호<input id="new-password" type="password" autocomplete="new-password" minlength="4" maxlength="128" required aria-describedby="password-help"></label>
+      <p id="password-help" class="muted small">4~128자. 한글과 특수문자도 사용할 수 있습니다.</p>
+      <label class="login-field">새 비밀번호 다시 입력<input id="confirm-password" type="password" autocomplete="new-password" minlength="4" maxlength="128" required></label>
+      <p id="admin-message" class="login-error" role="status" aria-live="polite"></p>
+      <button id="admin-save" class="accent" type="submit" disabled>팀원 비밀번호 변경</button>
+    </form>
   </dialog>
   <div id="toast" role="status" class="toast" hidden></div>
   </div>

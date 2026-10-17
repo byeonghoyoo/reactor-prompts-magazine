@@ -8,3 +8,8 @@ __pycache__/
 *.part
 download-log.jsonl
 source/index*
+node_modules/
+.wrangler/
+.dev.vars*
+.env*
+worker-configuration.d.ts

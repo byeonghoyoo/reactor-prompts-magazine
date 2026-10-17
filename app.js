@@ -2,7 +2,7 @@ import {extractArgs,compilePrompt,safeImage,validateEntry,openNotebook,allEntrie
 
 const $=id=>document.getElementById(id), fmt=value=>Number(value).toLocaleString('ko-KR');
 const PAGE_SIZE=60, viewLabels={all:'모든 프롬프트',favorites:'즐겨찾기',mine:'내 카드'};
-let catalog=null, db=null, entries=new Map(), cards=[], filtered=[], pageNumber=1, category='', view='all', detail=null, openToken=0, toastTimer;
+let catalog=null, db=null, entries=new Map(), cards=[], filtered=[], pageNumber=1, category='', view='all', source='', detail=null, openToken=0, toastTimer;
 let translationsPromise=null, loading=false;
 const chunks=new Map();
 const channel=typeof BroadcastChannel==='function' ? new BroadcastChannel('prompt-notebook-changes') : null;
@@ -36,6 +36,10 @@ function rebuildCards() {
   cards.sort((a,b)=>Number(!a.thumbnail)-Number(!b.thumbnail));
   for(const card of cards)card.searchText=[card.title,card.description,...card.tags,categoryLabel(card.category)].join(' ').toLocaleLowerCase();
   $('all-count').textContent=fmt(cards.length);
+  $('source-all-count').textContent=fmt(cards.length);
+  $('source-reactor-count').textContent=fmt(cards.filter(c=>c.origin==='reactor').length);
+  $('source-studio-count').textContent=fmt(cards.filter(c=>c.origin==='studio').length);
+  $('merge-summary').textContent=`처음 사이트와 PromptStudio 자료를 함께 모았습니다. 중복 ${fmt(catalog.summary.duplicatesMerged)}개는 한 카드로 합쳤습니다.`;
   $('favorite-count').textContent=fmt(cards.filter(c=>entries.get(c.id)?.favorite).length);
   $('mine-count').textContent=fmt(cards.filter(c=>c.personal).length);
   const counts=new Map(); for(const card of cards)counts.set(card.category,(counts.get(card.category)||0)+1);
@@ -49,7 +53,7 @@ function imageNode(src,alt) {
 function filter(reset=false) {
   if(reset)pageNumber=1;
   const words=$('search').value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean);
-  filtered=cards.filter(c=>(!category||c.category===category)&&(!words.length||words.every(w=>c.searchText.includes(w)))&&(!$('prompt-only').checked||c.hasPrompt)&&(!$('variables-only').checked||c.variables>0)&&(view==='all'||(view==='favorites'&&entries.get(c.id)?.favorite)||(view==='mine'&&c.personal)));
+  filtered=cards.filter(c=>(!source||c.origin===source)&&(!category||c.category===category)&&(!words.length||words.every(w=>c.searchText.includes(w)))&&(!$('prompt-only').checked||c.hasPrompt)&&(!$('variables-only').checked||c.variables>0)&&(view==='all'||(view==='favorites'&&entries.get(c.id)?.favorite)||(view==='mine'&&c.personal)));
   const sort=$('sort').value;
   if(sort==='title')filtered.sort((a,b)=>a.title.localeCompare(b.title,'ko'));
   if(sort==='variables')filtered.sort((a,b)=>b.variables-a.variables);
@@ -63,7 +67,7 @@ function render() {
     const image=el('div',undefined,'card-image'); image.append(imageNode(card.thumbnail,card.title));
     if(card.variables)image.append(el('span',`변수 ${card.variables}개`,'image-badge'));
     else if(card.imageCount>1)image.append(el('span',`${card.imageCount}장`,'image-badge'));
-    button.append(image,el('h2',card.title,'card-title'));
+    button.append(image,el('span',card.origin==='reactor'?'처음 사이트':card.origin==='studio'?'PromptStudio':'내 카드','card-source'),el('h2',card.title,'card-title'));
     const meta=el('div',undefined,'card-meta'); meta.append(el('span',categoryLabel(card.category)),el('span',card.hasPrompt?'프롬프트 수록':'이미지'));
     button.append(meta); button.onclick=()=>openDetail(card); article.append(button);
     const favorite=!!entries.get(card.id)?.favorite, star=el('button',favorite?'★':'☆','card-star'); star.setAttribute('aria-label',card.title+(favorite?' 즐겨찾기 해제':' 즐겨찾기 추가')); star.setAttribute('aria-pressed',String(favorite));
@@ -82,6 +86,7 @@ function render() {
   $('summary').textContent=`${fmt(filtered.length)}개의 아이디어를 둘러보고 나만의 프롬프트를 만들어 보세요.`;
   for(const button of document.querySelectorAll('[data-view]')) { if(button.dataset.view===view)button.setAttribute('aria-current','page');else button.removeAttribute('aria-current'); }
   for(const button of document.querySelectorAll('[data-category]'))button.setAttribute('aria-pressed',String(category===button.dataset.category));
+  for(const button of document.querySelectorAll('[data-source]'))button.setAttribute('aria-pressed',String(source===button.dataset.source));
   $('category-select').value=category;
 }
 function makeCategories() {
@@ -166,10 +171,11 @@ async function init() {
 
 $('search').oninput=()=>filter(true);$('prompt-only').onchange=()=>filter(true);$('variables-only').onchange=()=>filter(true);$('sort').onchange=()=>filter(true);
 $('category-select').onchange=()=>{category=$('category-select').value;filter(true);};
-for(const button of document.querySelectorAll('[data-view]'))button.onclick=()=>{view=button.dataset.view;category='';filter(true);};
+for(const button of document.querySelectorAll('[data-view]'))button.onclick=()=>{view=button.dataset.view;category='';source='';filter(true);};
+for(const button of document.querySelectorAll('[data-source]'))button.onclick=()=>{source=button.dataset.source;view='all';category='';$('search').value='';$('prompt-only').checked=false;$('variables-only').checked=false;filter(true);};
 $('previous').onclick=()=>{if(pageNumber>1){pageNumber--;render();window.scrollTo({top:0});}};
 $('next').onclick=()=>{if(pageNumber<Math.ceil(filtered.length/PAGE_SIZE)){pageNumber++;render();window.scrollTo({top:0});}};
-$('clear-filters').onclick=()=>{category='';view='all';$('search').value='';$('prompt-only').checked=false;$('variables-only').checked=false;filter(true);};
+$('clear-filters').onclick=()=>{category='';view='all';source='';$('search').value='';$('prompt-only').checked=false;$('variables-only').checked=false;filter(true);};
 $('close').onclick=closeDetail;$('detail').addEventListener('cancel',e=>{e.preventDefault();closeDetail();});
 $('image-previous').onclick=()=>{if(detail?.imageIndex>0){detail.imageIndex--;renderImage();}};
 $('image-next').onclick=()=>{if(detail&&detail.imageIndex<detail.images.length-1){detail.imageIndex++;renderImage();}};
@@ -210,3 +216,4 @@ $('retry').onclick=init;
 document.addEventListener('keydown',event=>{if(event.key==='/'&&!document.querySelector('dialog[open]')&&!['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)){event.preventDefault();$('search').focus();}});
 if(channel)channel.onmessage=async()=>{if(!db||!catalog)return;try{await reloadEntries();rebuildCards();filter();if(detail&&!$('detail-favorite').disabled)$('detail-favorite').checked=!!entries.get(detail.card.id)?.favorite;}catch(error){storageWarning(error);}};
 export function startNotebook() { void init(); }
+export function suspendNotebook() { closeDetail();clearTimeout(toastTimer);$('toast').hidden=true;$('prompt-editor').value=''; }

@@ -8,4 +8,20 @@
 .login-field input[aria-invalid=true]{border-color:#d69494}
 .login-error{min-height:22px;margin:13px 0 12px;color:#f0b6b6;font-size:12px;line-height:1.6;overflow-wrap:anywhere}
 #login-submit{width:100%;min-height:47px;font-size:14px}
+.login-mode{display:block;margin:20px auto 0;font-size:12px}
+.admin-dialog{width:min(510px,94vw)}
+.admin-dialog h2{font-size:15px;margin:0}
+.admin-body{padding:24px 28px 28px}
+.admin-intro{font-size:13px;line-height:1.8;color:var(--muted);margin:0 0 20px}
+.admin-body .login-field{margin-top:16px}
+.admin-body .login-field input{padding:11px 12px}
+.admin-body button[type=submit]{width:100%;min-height:46px;font-size:13px}
+.admin-body .success{color:#a7dbbd}
+.source-tabs{display:flex;gap:9px;flex-wrap:wrap}
+.source-tabs button{font-size:12px;padding:10px 13px;display:flex;gap:10px;align-items:center}
+.source-tabs button[aria-pressed=true]{background:#33415d;color:#e2eaff;border-color:#758bb5}
+.source-tabs span{font-size:11px;color:var(--muted)}
+.merge-summary{font-size:11px;line-height:1.8;margin:12px 0 20px}
+.card-source{display:block;margin-top:11px;font-size:9px;color:#a7b9d7}
+.card-source+.card-title{margin-top:4px}
 @media(max-width:480px){.login-screen{padding:24px 20px}.login-panel{padding:28px 24px}.login-panel h1{font-size:28px}}

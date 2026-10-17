@@ -1,0 +1,16 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "beauty-blossom-prompt-auth",
+  "main": "worker.ts",
+  "compatibility_date": "2026-10-17",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": true,
+  "preview_urls": false,
+  "vars": { "ALLOWED_ORIGIN": "https://byeonghoyoo.github.io" },
+  "d1_databases": [{
+    "binding": "DB",
+    "database_name": "beauty-blossom-prompt-auth",
+    "database_id": "52f05eda-2733-48a6-842a-1fc0512fa8ac"
+  }],
+  "observability": { "enabled": true, "head_sampling_rate": 0.1 }
+}
