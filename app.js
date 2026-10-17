@@ -158,6 +158,11 @@ async function copyPrompt() {
   const value=$('prompt-editor').value;if(!value.trim()){toast('복사할 프롬프트가 없습니다.',true);return false;}
   try{await navigator.clipboard.writeText(value);toast('프롬프트를 복사했습니다.');return true;}catch{ $('prompt-editor').focus();$('prompt-editor').select();toast('자동 복사가 허용되지 않습니다. 선택된 내용을 직접 복사해 주세요.',true);return false; }
 }
+async function copyPortraitInstruction() {
+  const field=$('portrait-instruction');
+  try{await navigator.clipboard.writeText(field.value);toast('인물 적용 문구를 복사했습니다. 프롬프트 끝에 붙여 넣으세요.');}
+  catch{field.focus();field.select();toast('문구를 선택했습니다. Ctrl+C 또는 길게 눌러 복사해 주세요.',true);}
+}
 async function init() {
   if(loading)return;loading=true;$('load-error').hidden=true;
   try {
@@ -212,6 +217,7 @@ $('language').onchange=async()=>{
   finally{$('language').disabled=false;}
 };
 $('copy').onclick=copyPrompt;for(const link of document.querySelectorAll('.ai-target'))link.addEventListener('click',()=>{void copyPrompt();});
+$('copy-portrait-instruction').onclick=copyPortraitInstruction;
 $('retry').onclick=init;
 document.addEventListener('keydown',event=>{if(event.key==='/'&&!document.querySelector('dialog[open]')&&!['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)){event.preventDefault();$('search').focus();}});
 if(channel)channel.onmessage=async()=>{if(!db||!catalog)return;try{await reloadEntries();rebuildCards();filter();if(detail&&!$('detail-favorite').disabled)$('detail-favorite').checked=!!entries.get(detail.card.id)?.favorite;}catch(error){storageWarning(error);}};

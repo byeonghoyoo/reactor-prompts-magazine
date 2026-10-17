@@ -5,7 +5,7 @@
   <meta name="description" content="이미지에서 찾고, 변수를 바꾸고, 프롬프트를 복사해 사용하는 프롬프트 노트."><meta name="theme-color" content="#171a21">
   <meta name="robots" content="noindex,nofollow,noarchive">
   <title>로그인 · 뷰티블라썸 프롬프트 노트</title><link rel="icon" href="data:,">
-  <link rel="stylesheet" href="style.css?v=notebook-5"><link rel="stylesheet" href="login.css?v=notebook-5"><script type="module" src="entry.js?v=notebook-5"></script>
+  <link rel="stylesheet" href="style.css?v=notebook-6"><link rel="stylesheet" href="login.css?v=notebook-6"><script type="module" src="entry.js?v=notebook-6"></script>
 </head>
 <body>
   <section id="login-screen" class="login-screen" aria-labelledby="login-title">
@@ -38,6 +38,11 @@
     </aside>
     <main id="library" tabindex="-1">
       <section class="library-heading"><div><p id="breadcrumb">나의 아이디어 라이브러리</p><h1 id="view-title">모든 프롬프트</h1><p id="summary" class="muted" aria-live="polite">이미지와 프롬프트를 불러오고 있습니다…</p></div><div class="heading-note">고른 다음, 바꾸고, 복사하세요.<span>이미지와 프롬프트를 한 곳에서.</span></div></section>
+      <section class="portrait-helper" aria-labelledby="portrait-heading">
+        <div class="portrait-intro"><h2 id="portrait-heading">첨부한 인물로 만들기</h2><p id="portrait-help">AI 서비스에 인물사진을 첨부하고, 선택한 프롬프트 맨 끝에 아래 문장을 붙여 넣으세요.</p></div>
+        <textarea id="portrait-instruction" readonly rows="3" aria-label="인물 적용 문구" aria-describedby="portrait-help">이 프롬프트를 참고해서 첨부한 이미지의 인물로 적용해 이미지를 생성해줘</textarea>
+        <button id="copy-portrait-instruction" class="accent" type="button">인물 적용 문구 복사</button>
+      </section>
       <div class="source-tabs" role="group" aria-label="자료 선택"><button data-source="" aria-pressed="true">전체 <span id="source-all-count">—</span></button><button data-source="reactor" aria-pressed="false">처음 사이트 <span id="source-reactor-count">—</span></button><button data-source="studio" aria-pressed="false">PromptStudio 추가 <span id="source-studio-count">—</span></button></div>
       <p id="merge-summary" class="merge-summary muted"></p>
       <div class="filters"><label class="mobile-category">카테고리<select id="category-select"><option value="">전체 주제</option></select></label><label><input id="prompt-only" type="checkbox">프롬프트 있음</label><label><input id="variables-only" type="checkbox">변수 수정 가능</label><label class="sort-label">정렬<select id="sort"><option value="default">추천 순서</option><option value="title">제목순</option><option value="variables">변수 많은 순</option></select></label><span id="result-count" aria-live="polite"></span></div>
