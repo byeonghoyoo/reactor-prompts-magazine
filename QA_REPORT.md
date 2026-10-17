@@ -1,6 +1,13 @@
 # 프롬프트 노트 검증 보고서
 
-검증일: 2026-10-17. 아래 내용은 배포 전 검증이며, 라이브 확인 결과는 배포 후 추가합니다.
+검증일: 2026-10-17. 로컬 검사와 공개 사이트 검증을 완료했습니다.
+
+## 공개 배포 검증
+
+- [공개 프롬프트 노트](https://byeonghoyoo.github.io/reactor-prompts-magazine/) — GitHub Pages [배포 39000582232](https://github.com/byeonghoyoo/reactor-prompts-magazine/actions/runs/39000582232) 성공, 구현 커밋 `84ef0f99`.
+- HTML·JavaScript·CSS·카탈로그·통합 결과 등 공개 파일 6개의 HTTP 200과 로컬 SHA-256 일치를 확인했습니다.
+- 공개 주소에서 아래 17개 기본 화면 검사를 다시 실행해 모두 통과했습니다. 데스크톱·모바일 화면과 초기 이미지 8개의 실제 로딩도 확인했습니다. 검증용 개인 노트는 제거했습니다.
+- [PromptStudio 보관본](https://github.com/byeonghoyoo/reactor-prompts-magazine/releases/tag/promptstudio-2026-10-17)의 자산 12개는 GitHub가 제공하는 SHA-256과 크기가 로컬 파일과 일치합니다. 이미지 ZIP 5개의 공개 다운로드 주소도 모두 HTTP 200입니다.
 
 ## 최종 결과
 
