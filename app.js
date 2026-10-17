@@ -1,4 +1,4 @@
-import {extractArgs,compilePrompt,safeImage,validateEntry,openNotebook,allEntries,updateEntry,mergeBackup} from './notebook-core.js?v=notebook-1';
+import {extractArgs,compilePrompt,safeImage,validateEntry,openNotebook,allEntries,updateEntry} from './notebook-core.js?v=notebook-1';
 
 const $=id=>document.getElementById(id), fmt=value=>Number(value).toLocaleString('ko-KR');
 const PAGE_SIZE=60, viewLabels={all:'모든 프롬프트',favorites:'즐겨찾기',mine:'내 카드'};
@@ -22,7 +22,7 @@ async function reloadEntries() {
   const rows=await allEntries(db),valid=new Map(),categoryIds=new Set(catalog.categories.map(c=>c.id));let invalid=0;
   for(const row of rows){try{const entry=validateEntry(row,categoryIds);valid.set(entry.id,entry);}catch{invalid++;}}
   entries=valid;
-  if(invalid){$('storage-warning').hidden=false;$('storage-warning').textContent=invalid+'개 저장 항목의 형식이 올바르지 않아 표시하지 못했습니다. 백업 다운로드로 원본을 보관할 수 있습니다.';}
+  if(invalid){$('storage-warning').hidden=false;$('storage-warning').textContent=invalid+'개 저장 항목의 형식이 올바르지 않아 표시하지 못했습니다. 기존 데이터는 그대로 보관되어 있습니다.';}
 }
 function categoryLabel(id) { return catalog?.categories.find(c=>c.id===id)?.label||'기타 아이디어'; }
 function effective(card) {
@@ -153,9 +153,6 @@ async function copyPrompt() {
   const value=$('prompt-editor').value;if(!value.trim()){toast('복사할 프롬프트가 없습니다.',true);return false;}
   try{await navigator.clipboard.writeText(value);toast('프롬프트를 복사했습니다.');return true;}catch{ $('prompt-editor').focus();$('prompt-editor').select();toast('자동 복사가 허용되지 않습니다. 선택된 내용을 직접 복사해 주세요.',true);return false; }
 }
-function downloadJson(data,name) {
-  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json;charset=utf-8'}),url=URL.createObjectURL(blob),a=el('a');a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),30000);
-}
 async function init() {
   if(loading)return;loading=true;$('load-error').hidden=true;
   try {
@@ -163,7 +160,6 @@ async function init() {
     const data=await response.json();if(!Array.isArray(data.cards)||!Array.isArray(data.categories)||!Array.isArray(data.groups))throw Error('라이브러리 데이터 형식 오류');catalog=data;
     try{db??=await openNotebook();await reloadEntries();}catch(error){storageWarning(error);}
     makeCategories();rebuildCards();filter();
-    const s=catalog.summary;$('coverage').textContent=`전체 ${fmt(s.totalCards)}개 카드. PromptStudio ${fmt(s.studioSourceCards)}개 중 중복 ${fmt(s.duplicatesMerged)}개를 합쳤습니다. PC 이미지 파일 ${fmt(s.cachedFiles)}개를 보관했습니다. PC에서 찾지 못한 이미지 ${fmt(s.missingLocalImages)}개와 기존 갤러리 서버의 누락 이미지는 기록에 남겼습니다.`;
   }catch(error){$('load-error').hidden=false;$('load-error-text').textContent='라이브러리를 불러오지 못했습니다. '+error.message;$('summary').textContent='연결을 확인하고 다시 불러와 주세요.';$('gallery').setAttribute('aria-busy','false');}
   finally{loading=false;}
 }
@@ -210,25 +206,7 @@ $('language').onchange=async()=>{
   finally{$('language').disabled=false;}
 };
 $('copy').onclick=copyPrompt;for(const link of document.querySelectorAll('.ai-target'))link.addEventListener('click',()=>{void copyPrompt();});
-for(const id of ['backup-open','backup-shortcut'])$(id).onclick=()=>{$('backup-status').textContent='';$('backup-dialog').showModal();};
-$('backup-close').onclick=()=>{document.body.append($('toast'));$('backup-dialog').close();};
-$('export-backup').onclick=async()=>{
-  try{const latest=db?await allEntries(db):[...entries.values()];downloadJson({format:'prompt-notebook-backup',version:1,exportedAt:new Date().toISOString(),entries:latest},'prompt-notes-'+new Date().toISOString().slice(0,10)+'.json');$('backup-status').textContent=fmt(latest.length)+'개 항목을 백업했습니다.';}catch(error){$('backup-status').textContent='백업하지 못했습니다. '+error.message;}
-};
-$('import-backup').onchange=async()=>{
-  const file=$('import-backup').files[0];if(!file)return;
-  try {
-    if(!catalog)throw Error('먼저 라이브러리를 불러와 주세요.');if(file.size>100*1024*1024)throw Error('100MB 이하의 백업 파일을 선택해 주세요.');
-    const data=JSON.parse(await file.text());if(data.format!=='prompt-notebook-backup'||data.version!==1||!Array.isArray(data.entries)||data.entries.length>40000)throw Error('프롬프트 노트 백업 파일이 아닙니다.');
-    const ids=new Set(catalog.categories.map(c=>c.id)),known=new Set(catalog.cards.map(c=>c.id));
-    const incoming=data.entries.map(e=>validateEntry(e,ids));if(new Set(incoming.map(e=>e.id)).size!==incoming.length)throw Error('중복된 노트 ID가 있는 백업입니다.');
-    if(!db)throw Error('브라우저 저장소를 사용할 수 없습니다.');
-    const accepted=await mergeBackup(db,incoming.filter(e=>e.id.startsWith('custom:')||known.has(e.id)));
-    await reloadEntries();channel?.postMessage('updated');rebuildCards();filter();$('backup-status').textContent=fmt(accepted)+'개 항목을 가져왔습니다. 더 최근에 저장한 기존 항목은 유지했습니다.';
-  }catch(error){$('backup-status').textContent='가져오지 못했습니다. '+error.message;}
-  finally{$('import-backup').value='';}
-};
 $('retry').onclick=init;
 document.addEventListener('keydown',event=>{if(event.key==='/'&&!document.querySelector('dialog[open]')&&!['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)){event.preventDefault();$('search').focus();}});
 if(channel)channel.onmessage=async()=>{if(!db||!catalog)return;try{await reloadEntries();rebuildCards();filter();if(detail&&!$('detail-favorite').disabled)$('detail-favorite').checked=!!entries.get(detail.card.id)?.favorite;}catch(error){storageWarning(error);}};
-init();
+export function startNotebook() { void init(); }

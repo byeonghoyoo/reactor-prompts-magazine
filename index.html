@@ -3,21 +3,37 @@
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="이미지에서 찾고, 변수를 바꾸고, 프롬프트를 복사해 사용하는 프롬프트 노트."><meta name="theme-color" content="#171a21">
-  <title>프롬프트 노트 · PromptStudio</title><link rel="icon" href="data:,">
-  <link rel="stylesheet" href="style.css?v=notebook-2"><script type="module" src="app.js?v=notebook-2"></script>
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <title>로그인 · 뷰티블라썸 프롬프트 노트</title><link rel="icon" href="data:,">
+  <link rel="stylesheet" href="style.css?v=notebook-3"><link rel="stylesheet" href="login.css?v=notebook-3"><script type="module" src="entry.js?v=notebook-3"></script>
 </head>
 <body>
+  <section id="login-screen" class="login-screen" aria-labelledby="login-title">
+    <div class="login-panel">
+      <div class="login-brand"><span class="brand-mark" aria-hidden="true">P<span>n</span></span><span>뷰티블라썸</span></div>
+      <h1 id="login-title">프롬프트 노트</h1>
+      <p class="login-description">아이디와 비밀번호를 입력해 주세요.</p>
+      <form id="login-form" method="post">
+        <label class="login-field" for="login-id">아이디<input id="login-id" name="username" type="text" autocomplete="username" maxlength="80" aria-describedby="login-error" required autofocus></label>
+        <label class="login-field" for="login-password">비밀번호<input id="login-password" name="password" type="password" autocomplete="current-password" maxlength="128" aria-describedby="login-error" required></label>
+        <p id="login-error" class="login-error" role="alert" aria-live="polite"></p>
+        <button id="login-submit" class="accent" type="submit" disabled>로그인</button>
+      </form>
+      <noscript><p class="login-error">로그인하려면 브라우저에서 자바스크립트를 켜 주세요.</p></noscript>
+    </div>
+  </section>
+  <div id="notebook-app" hidden>
   <a class="skip-link" href="#library">작품 목록으로 이동</a>
   <header class="topbar">
     <a class="brand" href="./"><span class="brand-mark" aria-hidden="true">P<span>n</span></span><span>프롬프트 노트<small>이미지를 아이디어로, 아이디어를 내 것으로.</small></span></a>
     <label class="search"><span aria-hidden="true">⌕</span><input id="search" type="search" maxlength="2000" placeholder="제목, 설명, 태그로 찾기" aria-label="프롬프트 검색" autocomplete="off"><kbd>/</kbd></label>
-    <div class="header-actions"><button id="backup-open" class="quiet">백업 · 안내</button></div>
+    <div class="header-actions"><button id="logout" class="quiet" type="button">로그아웃</button></div>
   </header>
   <div class="workspace">
     <aside class="sidebar" aria-label="노트 탐색">
       <nav class="views" id="views"><button data-view="all" aria-current="page"><span>모든 프롬프트</span><b id="all-count">—</b></button><button data-view="favorites"><span>☆ 즐겨찾기</span><b id="favorite-count">0</b></button><button data-view="mine"><span>내 카드</span><b id="mine-count">0</b></button></nav>
       <div class="sidebar-label">주제별로 찾기</div><nav id="categories" class="category-nav" aria-label="카테고리"></nav>
-      <div class="sidebar-foot"><span class="status-dot"></span>브라우저에 즐겨찾기 보관<button id="backup-shortcut">백업하기</button></div>
+      <div class="sidebar-foot"><span class="status-dot"></span>브라우저에 즐겨찾기 보관</div>
     </aside>
     <main id="library" tabindex="-1">
       <section class="library-heading"><div><p id="breadcrumb">나의 아이디어 라이브러리</p><h1 id="view-title">모든 프롬프트</h1><p id="summary" class="muted" aria-live="polite">이미지와 프롬프트를 불러오고 있습니다…</p></div><div class="heading-note">고른 다음, 바꾸고, 복사하세요.<span>이미지와 프롬프트를 한 곳에서.</span></div></section>
@@ -37,7 +53,7 @@
       </div>
     </div>
   </dialog>
-  <dialog id="backup-dialog" class="backup-dialog" aria-labelledby="backup-title"><div class="detail-top"><h2 id="backup-title">백업 · 자료 안내</h2><button id="backup-close" class="icon-button" aria-label="안내 닫기">×</button></div><div class="backup-body"><h3>내가 저장한 내용을 안전하게</h3><p>즐겨찾기는 이 브라우저에 저장됩니다. 이전 버전에서 보관한 자료도 백업에 포함됩니다. 다른 기기로 옮기거나 브라우저 데이터를 지우기 전에 백업해 주세요.</p><div class="backup-actions"><button id="export-backup" class="accent">백업 다운로드</button><label class="file-button">백업 가져오기<input id="import-backup" type="file" accept="application/json,.json"></label></div><p id="backup-status" role="status"></p><h3>라이브러리 보관 자료</h3><p id="coverage"></p><div class="resource-links"><a href="https://github.com/byeonghoyoo/reactor-prompts-magazine/releases/tag/promptstudio-2026-10-17" target="_blank" rel="noopener noreferrer">PromptStudio 이미지 · 전체 프롬프트</a><a href="https://github.com/byeonghoyoo/reactor-prompts-magazine/releases/tag/snapshot-2026-10-17" target="_blank" rel="noopener noreferrer">기존 갤러리 원본 이미지</a><a href="library/import-report.json" target="_blank" rel="noopener noreferrer">통합 기록</a></div><p class="small muted">이미지 분석·생성 API는 연결되어 있지 않습니다. AI 서비스의 생성 기능과 요금은 해당 서비스에서 확인해 주세요.</p></div></dialog>
   <div id="toast" role="status" class="toast" hidden></div>
+  </div>
 </body>
 </html>
