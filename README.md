@@ -1,42 +1,47 @@
-# Reactor Prompt Archive
+# 프롬프트 노트
 
-[갤러리 열기](https://byeonghoyoo.github.io/reactor-prompts-magazine/) · [원본 이미지 ZIP](https://github.com/byeonghoyoo/reactor-prompts-magazine/releases/tag/snapshot-2026-10-17) · [원본 사이트](https://reactor-prompts-magazine.pages.dev)
+[프롬프트 노트 열기](https://byeonghoyoo.github.io/reactor-prompts-magazine/)
 
-2026년 10월 17일 공개 페이지의 이미지와 AI 프롬프트를 보관한 개인 학습용 아카이브입니다. 원본 운영자와 관련이 없으며, 이미지와 프롬프트의 권리는 원저작자에게 있습니다.
+Reactor 갤러리와 PC의 PromptStudio 자료를 하나로 정리한 개인 프롬프트 라이브러리입니다.
+
+## 사용하기
+
+- 6개 주제 묶음, 27개 카테고리에서 이미지와 프롬프트를 찾습니다.
+- 제목·설명·태그·개인 메모를 검색하고, 프롬프트/변수가 있는 카드만 필터링합니다.
+- 카드를 열어 변수를 바꾸고 프롬프트를 편집·복사합니다. ChatGPT, Gemini, Higgsfield 열기 버튼은 복사와 서비스 페이지 열기를 제공합니다.
+- 즐겨찾기, 편집한 프롬프트, 개인 메모와 태그를 브라우저에 저장합니다.
+- **내 카드**에서 이미지와 직접 작성한 프롬프트를 추가합니다. `{주제}`, `{색상}` 같은 변수를 쓰고 **변수 찾기**를 누르면 입력칸이 생깁니다.
+- **백업 · 안내**에서 내 노트를 JSON 파일로 백업하고 다른 브라우저에 가져올 수 있습니다.
+
+**개인 노트는 현재 브라우저의 IndexedDB에 저장됩니다. GitHub나 다른 기기에 자동 동기화되지 않습니다.** 브라우저 데이터를 지우기 전에는 백업해 주세요. 이미지 분석·생성 API는 연결하지 않았습니다.
 
 ## 보관 범위
 
 | 항목 | 수량 |
-| --- | ---: |
-| 게시물 데이터 | 4,361개 |
-| 프롬프트가 있는 게시물 | 3,042개 |
-| 원본에 등록된 이미지 | 18,527장 |
-| 내려받아 보관한 이미지 | 16,011장 |
-| 원본 서버에서 제공되지 않은 이미지 | 2,516장 |
-| 썸네일 포함 보관 파일 | 19,725개 |
+|---|---:|
+| 통합 카드 | 27,162 |
+| 프롬프트가 있는 카드 | 25,835 |
+| 기존 Reactor 게시물 | 4,361 |
+| PromptStudio 원본 카드 | 23,616 |
+| 중복 병합 | 815 |
+| 새로 추가한 PromptStudio 카드 | 22,801 |
+| PC에 저장된 이미지 파일 | 24,024 |
+| PC 이미지의 고유 SHA-256 | 22,812 |
 
-원본 서버의 404/410 응답으로 내려받지 못한 파일은 [missing-images.json](missing-images.json)에 URL과 상태를 기록했습니다. 해당 게시물과 프롬프트는 삭제하지 않고 보존했습니다.
+중복은 공백·유니코드를 정규화한 프롬프트와 변수 기본값을 적용한 결과를 비교했습니다. 같은 프롬프트의 추가 이미지를 합치고, 수정할 수 있는 변수가 더 많은 템플릿을 보존했습니다. 카테고리는 제목·설명·태그·프롬프트의 용도에 따라 분류했으며, 개인 노트에서 변경할 수 있습니다.
 
-## 이미지와 프롬프트 받기
+- [PromptStudio 이미지 ZIP 5개와 전체 데이터](https://github.com/byeonghoyoo/reactor-prompts-magazine/releases/tag/promptstudio-2026-10-17): PC 이미지 4,008,062,102바이트. **대부분 앱이 캐시한 미리보기**이며, PC에 있던 파일을 재압축하지 않고 ZIP에 보관했습니다. 파일이 없는 이전 사용자 카드 이미지 2개는 [누락 기록](library/missing-images.json)에 남겼습니다.
+- [기존 Reactor 원본 ZIP 8개](https://github.com/byeonghoyoo/reactor-prompts-magazine/releases/tag/snapshot-2026-10-17): 원본 이미지 16,011장과 추가 썸네일 3,714개를 보관했습니다. 원래 서버에서 404였던 이미지 2,516장은 [기존 누락 기록](missing-images.json)에 남아 있습니다.
+- [통합 결과](library/import-report.json) · [중복 병합 기록](library/duplicates.json) · [검증 보고서](QA_REPORT.md)
 
-- **원본 이미지**: [GitHub 릴리스](https://github.com/byeonghoyoo/reactor-prompts-magazine/releases/tag/snapshot-2026-10-17)의 ZIP 8개. 각 ZIP을 독립적으로 풀 수 있습니다. 원본 파일은 재압축하거나 수정하지 않았습니다. 총 6.35 GiB입니다.
-- **웹 미리보기**: `previews/`의 WebP 파일입니다. 최대 960픽셀로 축소해 GitHub Pages에서 열람할 수 있게 했습니다.
-- **전체 프롬프트**: [prompts.json](prompts.json). 프롬프트가 없는 게시물은 빈 문자열로 보존합니다.
-- **원본 데이터**: [source/gallery-data.json](source/gallery-data.json), [source/translations.json](source/translations.json). 한국어·영어·일본어·중국어 번역 데이터를 포함합니다.
-- **무결성 기록**: [image-manifest.json](image-manifest.json)에 원본 URL, SHA-256, 크기, 보관 ZIP, 미리보기 경로가 있습니다.
+기존 원본 데이터 `source/gallery-data.json`, 번역 `source/translations.json`, 프롬프트 `prompts.json`은 유지했습니다. 전체 통합 데이터는 새 Release의 `prompt-notebook-data.json`, PC 원본 데이터는 `promptstudio-prompts.json`에서 내려받을 수 있습니다.
 
-## 검증
+## 운영
 
-ZIP에 들어 있는 원본 19,725개를 SHA-256으로 전수 확인하고, 미리보기 19,725개를 실제 디코딩했습니다. 프롬프트는 원본 데이터와 문자열 단위로 비교했습니다.
+외부 라이브러리 없는 정적 사이트이며 GitHub Pages에서 운영됩니다. 검증 시 사이트 파일 합계는 890,356,794바이트로 1GB 미만입니다. GitHub 유료 전환이나 API 결제 없이 동작합니다. 웹 미리보기는 가볍게 압축되어 있으며 보관 파일은 Releases에서 제공합니다.
 
-[검증 상세](QA_REPORT.md) · [검증 결과 JSON](validation-results.json) · [이전 요약](migration-summary.json)
+로컬 실행: `python -m http.server 8765 --bind 127.0.0.1`
 
-## 로컬 실행
+`scripts/migrate.py`는 최초 Reactor 보관용, `scripts/import_studio.py`는 로컬 PromptStudio 스냅샷 통합용입니다. 후자는 `output/studio-source/source.json`에 준비한 읽기 전용 데이터 사본과 PC 캐시를 사용합니다. `--catalog-only`는 기존 이미지 보관 기록을 이용해 카탈로그만 다시 만듭니다. 데이터 생성이 끝난 뒤 업로드하세요.
 
-```powershell
-python -m http.server 8765
-```
-
-브라우저에서 `http://localhost:8765`를 열면 됩니다. 갤러리 자체는 빌드 과정이나 외부 라이브러리 CDN이 필요하지 않습니다.
-
-`scripts/migrate.py`는 Python 3.11 이상과 `requests`, `Pillow`를 사용하는 수집 스크립트입니다. 자동 실행 일정은 설정하지 않았습니다. 다시 실행하면 보관된 진행 기록을 확인하고 필요한 파일을 이어서 수집합니다.
+이미지·프롬프트의 권리는 원저작자에게 있습니다. 원본 운영자와 관계없는 개인 학습용 보관본이며, 원본 콘텐츠에 새 라이선스를 부여하지 않습니다. [원본 Reactor 사이트](https://reactor-prompts-magazine.pages.dev/)
