@@ -1,0 +1,10 @@
+originals/
+release-assets/
+graphify-out/
+.bug-hunter/
+.playwright-cli/
+output/
+__pycache__/
+*.part
+download-log.jsonl
+source/index*

@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Reactor 이미지와 AI 프롬프트 개인 보관 갤러리. 이미지 검색, 프롬프트 복사, 원본 아카이브 다운로드.">
+  <title>Reactor — Prompt Archive</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <header class="masthead">
+    <a href="./" class="wordmark" aria-label="Reactor 처음으로">reactor<span>↗</span></a>
+    <nav aria-label="자료 다운로드">
+      <a href="prompts.json" download>프롬프트 전체</a>
+      <a href="https://github.com/byeonghoyoo/reactor-prompts-magazine/releases/tag/snapshot-2026-10-17">원본 이미지 ZIP</a>
+      <a href="https://github.com/byeonghoyoo/reactor-prompts-magazine">GitHub</a>
+    </nav>
+  </header>
+  <main>
+    <section class="intro">
+      <div><p class="edition">Prompt Archive / 2026.10.17</p><h1>이미지에서 시작하는<br>다음 아이디어.</h1></div>
+      <div class="intro-aside"><p>마음에 드는 이미지를 열고,<br>그 뒤의 프롬프트를 가져가세요.</p><p id="summary" class="summary" aria-live="polite">아카이브를 불러오는 중…</p></div>
+    </section>
+    <section class="browse" aria-label="프롬프트 탐색">
+      <div class="tools"><label class="search"><span>검색</span><input id="search" type="search" placeholder="인물, 한복, cinematic…" autocomplete="off" maxlength="10000"></label><label class="prompt-filter"><input id="prompt-only" type="checkbox">프롬프트 있는 작품만</label><label class="sort-label">정렬<select id="sort"><option value="original">원본 순서</option><option value="id-desc">번호 높은 순</option><option value="id-asc">번호 낮은 순</option></select></label></div>
+      <div id="categories" class="categories" aria-label="카테고리"></div>
+      <div class="results-heading"><p id="result-count" aria-live="polite"></p><span>이미지를 눌러 프롬프트 보기</span></div>
+      <p id="load-error" class="notice" hidden></p>
+      <div id="gallery" class="gallery" aria-busy="true"></div>
+      <p id="empty" class="empty" hidden>검색 결과가 없습니다. 다른 검색어나 카테고리를 선택해 주세요.</p>
+      <div class="pagination"><button id="previous" disabled>이전</button><span id="page-number"></span><button id="next" disabled>다음</button></div>
+    </section>
+    <details class="archive-info"><summary>보관 범위와 원본 파일 안내</summary><p id="coverage"></p><p>갤러리 이미지는 열람용 WebP 미리보기입니다. 내려받은 원본은 재압축하지 않고 ZIP에 보관했으며, 각 파일의 SHA-256 값을 기록했습니다. ZIP 파일은 각각 독립적으로 압축을 풀 수 있습니다.</p><div id="archives" class="archive-links"></div><p><a href="missing-images.json">원본에서 불러오지 못한 이미지 목록</a> · <a href="image-manifest.json">파일별 보관 기록</a> · <a href="source/translations.json" download>원본 번역 데이터</a> · <a href="source/gallery-data.json" download>원본 데이터 전체</a></p></details>
+  </main>
+  <footer><p>개인 학습용 보관본. 원본 운영자와 관련이 없습니다. 이미지와 프롬프트의 권리는 원저작자에게 있습니다.</p><a href="https://reactor-prompts-magazine.pages.dev/" target="_blank" rel="noopener noreferrer">Reactor 원본 사이트</a></footer>
+  <dialog id="detail" aria-labelledby="detail-title">
+    <button id="close" class="close" aria-label="상세 닫기">×</button>
+    <div class="detail-layout"><div class="image-panel"><div id="image-stage" class="image-stage"></div><div class="image-controls"><button id="image-previous" aria-label="이전 이미지">←</button><span id="image-number"></span><button id="image-next" aria-label="다음 이미지">→</button></div></div>
+    <div class="prompt-panel"><p id="detail-meta" class="detail-meta"></p><h2 id="detail-title"></h2><div id="detail-tags" class="detail-tags"></div><div class="prompt-heading"><h3>프롬프트</h3><label>언어<select id="language"><option value="original">원문</option><option value="ko">한국어</option><option value="en">English</option><option value="ja">日本語</option><option value="zh">中文</option></select></label></div><p id="translation-note" class="translation-note"></p><pre id="prompt-text"></pre><div class="detail-actions"><button id="copy" class="primary">프롬프트 복사</button><a id="preview-download" download>미리보기 저장</a><a id="original-download">원본 ZIP</a></div><p id="detail-status" aria-live="polite"></p><a id="original-post" target="_blank" rel="noopener noreferrer">원본 게시물 보기</a></div></div>
+  </dialog>
+</body>
+</html>

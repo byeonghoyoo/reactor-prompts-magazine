@@ -1,0 +1,10 @@
+{
+  "posts_exact": 4361,
+  "nonempty_prompts_exact": 3042,
+  "original_files_sha256_verified": 19725,
+  "previews_fully_decoded": 19725,
+  "missing_all_terminal_404_or_410": 2516,
+  "preview_bytes": 594236184,
+  "archive_parts": 8,
+  "pass": true
+}

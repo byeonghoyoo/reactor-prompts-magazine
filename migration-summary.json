@@ -1,0 +1,57 @@
+{
+  "source": "https://reactor-prompts-magazine.pages.dev",
+  "snapshot_date": "2026-10-17",
+  "posts": 4361,
+  "posts_with_prompt": 3042,
+  "image_references": 18527,
+  "unique_images": 18527,
+  "unique_files_including_thumbnails": 22241,
+  "saved_images": 16011,
+  "saved_files_including_thumbnails": 19725,
+  "missing_images": 2516,
+  "missing_files_including_thumbnails": 2516,
+  "original_bytes": 6822175499,
+  "preview_bytes": 594236184,
+  "archives": [
+    {
+      "name": "original-images-01.zip",
+      "bytes": 943657903,
+      "sha256": "f2d8d822a6419d73a9be0aa921bfeae7b0cdd6d8b428262ba95bcbce99ef01e8"
+    },
+    {
+      "name": "original-images-02.zip",
+      "bytes": 943363305,
+      "sha256": "e447fe298589bc3389e7ba9bce902cb1515396b55c99e7f346dd1886d1575d7d"
+    },
+    {
+      "name": "original-images-03.zip",
+      "bytes": 943959232,
+      "sha256": "b810936580aca9bda43e023f5efd1b25c42bf5d41660206b50d95695a82b2227"
+    },
+    {
+      "name": "original-images-04.zip",
+      "bytes": 944137144,
+      "sha256": "9deed2a63cb8aef22f74a445b237559e949658dd686cb48fed63b34912a51aaa"
+    },
+    {
+      "name": "original-images-05.zip",
+      "bytes": 944065504,
+      "sha256": "7178f4a2cac6579876857b7884729090f09aa4ca551d2f2748b29c500cfeea5c"
+    },
+    {
+      "name": "original-images-06.zip",
+      "bytes": 943933637,
+      "sha256": "88039f70efa8f98fa1836a5365937d42f2b7fa4c9b70c7d410fa39ec0286940b"
+    },
+    {
+      "name": "original-images-07.zip",
+      "bytes": 944113416,
+      "sha256": "317cdc6bcd76a61a49ab48331cf2c91197f3b02ae1f6a025bb6e72a47f8927c5"
+    },
+    {
+      "name": "original-images-08.zip",
+      "bytes": 218037472,
+      "sha256": "1844c6cc59cd7b8a933d0fdbda687735e4777803998ea7778b370d72cd467515"
+    }
+  ]
+}
