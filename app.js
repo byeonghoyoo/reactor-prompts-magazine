@@ -11,8 +11,15 @@ function element(tag, text, className) {
   if (className) node.className = className;
   return node;
 }
-function safeExternal(value) {
-  try { const url = new URL(value); return url.protocol === 'https:' ? url.href : ''; } catch { return ''; }
+function cleanCaption(value) {
+  if (typeof value !== 'string') return '';
+  return value.split(/\r?\n/).map((line) => line.trim()).filter((line) => {
+    const commentNotice = /(?:프롬|프론프트|프롭프트|프름|링크|신청|요강|다운로드).*댓글|댓글.*(?:프롬|프론프트|프롭프트|프름|링크)|^[\s\p{P}\p{S}]*댓글(?:에|로|에서)?\s*(?:있어|봐|확인|주르륵|$)/u.test(line);
+    const collectionNotice = /(?:그\s*동안|계정의|모든).*프롬프트.*(?:여기에|다\s*있어)/u.test(line);
+    const publisherNotice = /^(?:배포자|게시자|작성자|출처)\s*[:：]/u.test(line);
+    const collectionLink = /(?:reactorprompt\.vercel\.app|reactor-prompts-magazine\.pages\.dev)/i.test(line);
+    return !commentNotice && !collectionNotice && !publisherNotice && !collectionLink;
+  }).join('\n').replace(/\n{3,}/g, '\n\n').trim();
 }
 function placeholder() { return element('span', '원본에서 불러올 수 없는 이미지', 'placeholder'); }
 function makeImage(src, alt) {
@@ -86,7 +93,7 @@ function renderPrompt() {
   const language = $('language').value;
   const translated = language === 'original' ? '' : translations[language]?.[`prompt_${selected.id}`];
   const prompt = typeof translated === 'string' && translated.trim() ? translated : selected.prompt;
-  $('prompt-text').textContent = prompt || '원본 게시물에 등록된 프롬프트가 없습니다.';
+  $('prompt-text').textContent = prompt || '등록된 프롬프트가 없습니다.';
   $('translation-note').textContent = language !== 'original' && !translated && selected.prompt ? '이 언어의 원본 번역이 없어 원문을 표시합니다.' : '';
   $('copy').disabled = !prompt;
   $('copy').textContent = '프롬프트 복사';
@@ -96,9 +103,6 @@ function openDetail(post) {
   $('detail-title').textContent = post.caption || '제목 없는 작품';
   $('detail-meta').textContent = `No. ${post.id}${post.date_display ? ' / ' + post.date_display : ''}`;
   $('detail-tags').textContent = post.tags.map((tag) => categories[tag] || tag).join(' · ');
-  const url = safeExternal(post.threadsUrl);
-  $('original-post').hidden = !url;
-  if (url) $('original-post').href = url;
   renderImage(); renderPrompt();
   $('detail').showModal();
   $('detail').scrollTop = 0;
@@ -129,7 +133,7 @@ async function init() {
     const data = await response.json();
     if (!Array.isArray(data.posts)) throw new Error('Invalid gallery data');
     categories = data.categories || {};
-    posts = data.posts.map((post) => ({...post, caption: typeof post.caption === 'string' ? post.caption : '', prompt: typeof post.prompt === 'string' ? post.prompt : '', tags: Array.isArray(post.tags) ? post.tags : [], images: Array.isArray(post.images) ? post.images : []}));
+    posts = data.posts.map((post) => ({...post, caption: cleanCaption(post.caption), prompt: typeof post.prompt === 'string' ? post.prompt : '', tags: Array.isArray(post.tags) ? post.tags : [], images: Array.isArray(post.images) ? post.images : []}));
     for (const post of posts) post.searchText = [post.id, post.caption, post.prompt, ...post.tags.map((tag) => categories[tag] || tag)].join(' ').toLocaleLowerCase();
     const summary = data.summary;
     $('summary').textContent = `${number(summary.posts)}개 작품 / ${number(summary.posts_with_prompt)}개 프롬프트 / ${number(summary.saved_images)}장 보관`;
